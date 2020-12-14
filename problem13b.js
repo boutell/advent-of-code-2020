@@ -1,8 +1,8 @@
 const fs = require('fs');
 
-// const data = fs.readFileSync('input13.txt', 'utf8');
-const data = `939
-7,13,x,x,59,x,31,19`;
+const data = fs.readFileSync('input13.txt', 'utf8');
+// const data = `939
+// 7,13,x,x,59,x,31,19`;
 
 const lines = data.split('\n').map(line => line.trim()).filter(line => line.length);
 
@@ -27,10 +27,11 @@ pairs.sort((a, b) => {
     return 0;
   }
 });
-let now = 0;
+let zeroTime = pairs[0][1];
 let max = 0;
 console.log(pairs);
 while (true) {
+  const now = zeroTime - pairs[0][0];
   let i;
   for (i = 0; (i < pairs.length); i++) {
     if ((now + pairs[i][0]) % pairs[i][1]) {
@@ -45,5 +46,5 @@ while (true) {
     console.log(now);
     break;
   }
-  now++;
+  zeroTime += pairs[0][1];
 }
