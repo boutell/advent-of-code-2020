@@ -28,16 +28,17 @@ pairs.sort((a, b) => {
   }
 });
 let zeroTime = pairs[0][1];
-let max = 0;
+let max = -1;
 console.log(pairs);
 while (true) {
+  // console.log(zeroTime);
   const now = zeroTime - pairs[0][0];
   let i;
-  for (i = 0; (i < pairs.length); i++) {
+  for (i = 1; (i < pairs.length); i++) {
     if ((now + pairs[i][0]) % pairs[i][1]) {
       break;
     }
-    if ((max === undefined) || (i > max)) {
+    if (i > max) {
       max = i;
       console.log(`${max} (${pairs[i][1]}) @${now}`);
     }
