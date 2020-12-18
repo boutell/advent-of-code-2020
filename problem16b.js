@@ -2,18 +2,17 @@ const fs = require('fs');
 
 const data = fs.readFileSync('input16.txt', 'utf8');
 // const data = `
-// class: 1-3 or 5-7
-// row: 6-11 or 33-44
-// seat: 13-40 or 45-50
+// class: 0-1 or 4-19
+// row: 0-5 or 8-19
+// seat: 0-13 or 16-19
 
 // your ticket:
-// 7,1,14
+// 11,12,13
 
 // nearby tickets:
-// 7,3,47
-// 40,4,50
-// 55,2,20
-// 38,6,12
+// 3,9,18
+// 15,1,5
+// 5,14,9
 // `;
 const lines = data.split('\n').map(line => line.trim()).filter(line => line.length);
 const valid = {};
@@ -43,6 +42,10 @@ for (const line of lines) {
     }
   }
 }
+
+const your = lines.findIndex(line => line.match(/^your/));
+const yourTicket = lines[your + 1].split(',').map(s => parseInt(s));
+
 const nearby = lines.findIndex(line => line.match(/^nearby/));
 for (let i = nearby + 1; (i < lines.length); i++) {
   if (lines[i].match(/,/)) {
@@ -55,39 +58,48 @@ for (let i = nearby + 1; (i < lines.length); i++) {
 
 const validTickets = tickets.filter(ticket => !ticket.values.find(value => !valid[value]));
 
-let changed;
-let passes = 0;
-do {
-  changed = false;
-  passes++;
-  let min = 0;
-  for (const ticket of validTickets) {
-    if (Object.keys(ticket.fields).length === labels.length) {
-      continue;
-    }
-    const newValues = [];
-    for (const value of ticket.values) {
-      console.log(value, valid[value]);
-      if (valid[value].length < 19) {
-        console.log('WOW');
-      }
-      const possibleFields = valid[value].filter(label => !ticket.fields[label]);
-      // console.log(value, possibleFields);
-      // console.log(value);
-      if ((!min) || (possibleFields.length < min)) {
-        min = possibleFields.length;
-      }
-      if (possibleFields.length === 1) {
-        console.log('BOOM');
-        ticket.fields[valid[value]] = value;
-        changed = true;
-      } else {
-        newValues.push(value);
+const positions = [];
+
+for (let position = 0; (position < labels.length); position++) {
+  for (const label of labels) {
+    let bad = false;
+    for (const ticket of validTickets) {
+      if (!valid[ticket.values[position]].includes(label)) {
+        bad = true;
+        break;
       }
     }
-    ticket.values = newValues;
+    if (!bad) {
+      positions[position] = positions[position] || [];
+      positions[position].push(label);
+    }
   }
-  console.log(min);
-} while (changed);
-console.log(passes);
-// console.log(validTickets);
+}
+
+while (true) {
+  const known = {};
+  for (const [ position, value ] of Object.entries(positions)) {
+    if (value.length === 1) {
+      known[position] = value[0];
+    }
+  }
+  for (const [ position, value ] of Object.entries(positions)) {
+    for (const label of Object.values(known)) {
+      if (value.length > 1 && value.includes(label)) {
+        positions[position] = value.filter(_label => label !== _label);
+      }
+    }
+  }
+  if (Object.keys(known).length === positions.length) {
+    break;
+  }
+}
+
+let product = 1;
+for (const [ position, value ] of Object.entries(positions)) {
+  console.log(`${value[0]}: ${yourTicket[position]}`);
+  if (value[0].startsWith('departure')) {
+    product *= yourTicket[position];
+  }
+}
+console.log(product);
