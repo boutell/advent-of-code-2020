@@ -91,14 +91,14 @@ for (const input of inputs) {
   let offset = 0;
   const cache = {};
   try {
-    if (parse('0', 0, true).length) {
+    if (parse('0', true).length) {
       good++;
       console.log(`Yes: ${input}`);
     }
   } catch (e) {
     // Nope
   }
-  function parse(index, depth, terminal) {
+  function parse(index, terminal) {
     const key = `${index}:${offset}:${terminal}`;
     if (cache[key] !== undefined) {
       return cache[key];
@@ -125,7 +125,7 @@ for (const input of inputs) {
           for (let j = 0; (j < continuations.length); j++) {
             const index = set[i];
             offset = continuations[j];
-            nextContinuations = [...nextContinuations, ...parse(index, depth + 1, false) ];
+            nextContinuations = [...nextContinuations, ...parse(index, false) ];
           }
           continuations = [... new Set(nextContinuations)];
         }
